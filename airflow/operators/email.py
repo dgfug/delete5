@@ -15,10 +15,16 @@
 # KIND, either express or implied.  See the License for the
 # specific language governing permissions and limitations
 # under the License.
-from typing import Any, Dict, List, Optional, Union
+from __future__ import annotations
 
-from airflow.models import BaseOperator
+from collections.abc import Sequence
+from typing import TYPE_CHECKING, Any
+
+from airflow.models.baseoperator import BaseOperator
 from airflow.utils.email import send_email
+
+if TYPE_CHECKING:
+    from airflow.utils.context import Context
 
 
 class EmailOperator(BaseOperator):
@@ -26,45 +32,36 @@ class EmailOperator(BaseOperator):
     Sends an email.
 
     :param to: list of emails to send the email to. (templated)
-    :type to: list or string (comma or semicolon delimited)
     :param subject: subject line for the email. (templated)
-    :type subject: str
     :param html_content: content of the email, html markup
         is allowed. (templated)
-    :type html_content: str
     :param files: file names to attach in email (templated)
-    :type files: list
     :param cc: list of recipients to be added in CC field
-    :type cc: list or string (comma or semicolon delimited)
     :param bcc: list of recipients to be added in BCC field
-    :type bcc: list or string (comma or semicolon delimited)
     :param mime_subtype: MIME sub content type
-    :type mime_subtype: str
     :param mime_charset: character set parameter added to the Content-Type
         header.
-    :type mime_charset: str
     :param custom_headers: additional headers to add to the MIME message.
-    :type custom_headers: dict
     """
 
-    template_fields = ('to', 'subject', 'html_content', 'files')
+    template_fields: Sequence[str] = ("to", "subject", "html_content", "files")
     template_fields_renderers = {"html_content": "html"}
-    template_ext = ('.html',)
-    ui_color = '#e6faf9'
+    template_ext: Sequence[str] = (".html",)
+    ui_color = "#e6faf9"
 
     def __init__(
         self,
         *,
-        to: Union[List[str], str],
+        to: list[str] | str,
         subject: str,
         html_content: str,
-        files: Optional[List] = None,
-        cc: Optional[Union[List[str], str]] = None,
-        bcc: Optional[Union[List[str], str]] = None,
-        mime_subtype: str = 'mixed',
-        mime_charset: str = 'utf-8',
-        conn_id: Optional[str] = None,
-        custom_headers: Optional[Dict[str, Any]] = None,
+        files: list | None = None,
+        cc: list[str] | str | None = None,
+        bcc: list[str] | str | None = None,
+        mime_subtype: str = "mixed",
+        mime_charset: str = "utf-8",
+        conn_id: str | None = None,
+        custom_headers: dict[str, Any] | None = None,
         **kwargs,
     ) -> None:
         super().__init__(**kwargs)
@@ -79,7 +76,7 @@ class EmailOperator(BaseOperator):
         self.conn_id = conn_id
         self.custom_headers = custom_headers
 
-    def execute(self, context):
+    def execute(self, context: Context):
         send_email(
             self.to,
             self.subject,

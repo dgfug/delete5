@@ -25,7 +25,7 @@ for authentication. To enable it, set the following option in the configuration:
 .. code-block:: ini
 
     [api]
-    auth_backend = airflow.providers.google.common.auth_backend.google_openid
+    auth_backends = airflow.providers.google.common.auth_backend.google_openid
 
 It is also highly recommended to configure an OAuth2 audience so that the generated tokens are restricted to
 use by Airflow only.
@@ -60,7 +60,7 @@ look like the following.
       ENDPOINT_URL="http://localhost:8080/"
 
       AUDIENCE="project-id-random-value.apps.googleusercontent.com"
-      ID_TOKEN="$(gcloud auth print-identity-token "--audience=${AUDIENCE}")"
+      ID_TOKEN="$(gcloud auth print-identity-token "--audiences=${AUDIENCE}")"
 
       curl -X GET  \
           "${ENDPOINT_URL}/api/experimental/pools" \
